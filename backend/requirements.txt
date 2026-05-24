@@ -1,0 +1,54 @@
+# Core
+groq
+python-dotenv
+
+# Backend API
+fastapi
+uvicorn
+python-multipart
+httpx
+redis
+mem0ai
+
+# Database
+sqlalchemy
+aiosqlite
+
+# Frontend
+streamlit
+streamlit-chat
+
+# WhatsApp
+twilio
+
+# Language
+langdetect
+
+# Voice
+faster-whisper
+pydub
+
+# Utilities
+requests
+phonenumbers
+pandas
+numpy
+
+# RAG
+sentence-transformers
+PyMuPDF
+faiss-cpu
+
+# Validation
+pydantic
+
+python-jose[cryptography]
+
+# Stateful Agent Orchestration
+langgraph
+langchain
+langchain-groq
+
+redis
+
+mem0ai
