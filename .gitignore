@@ -1,9 +1,41 @@
+# Environment variables
 .env
 backend/.env
+
+# Logs
 *.log
 logs/
 backend/logs/
+
+# Data / Vector DB
 data/
+backend/rag/vector_store/
+
+# Python cache
 __pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
 venv/
+.venv/
 backend/.venv/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Docker
+*.tar
+
+# Pytest
+.pytest_cache/
+
+# Build files
+dist/
+build/
+*.egg-info/

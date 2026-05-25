@@ -7,9 +7,23 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 
 
-PDF_FOLDER = "rag/documents"
-VECTOR_DB_PATH = "rag/vector_store/faiss_index.bin"
-CHUNKS_PATH = "rag/vector_store/chunks.pkl"
+BASE_DIR = "/app"
+
+PDF_FOLDER = os.path.join(BASE_DIR, "rag/documents")
+VECTOR_STORE_DIR = os.path.join(BASE_DIR, "rag/vector_store")
+
+VECTOR_DB_PATH = os.path.join(
+    VECTOR_STORE_DIR,
+    "faiss_index.bin"
+)
+
+CHUNKS_PATH = os.path.join(
+    VECTOR_STORE_DIR,
+    "chunks.pkl"
+)
+
+# Create vector_store folder automatically
+os.makedirs(VECTOR_STORE_DIR, exist_ok=True)
 
 # Embedding model
 embedding_model = SentenceTransformer(
@@ -46,6 +60,10 @@ def chunk_text(text, chunk_size=500):
 
 all_chunks = []
 
+# Check documents folder exists
+if not os.path.exists(PDF_FOLDER):
+    raise Exception(f"PDF folder not found: {PDF_FOLDER}")
+
 # Read PDFs
 for filename in os.listdir(PDF_FOLDER):
 
@@ -61,6 +79,11 @@ for filename in os.listdir(PDF_FOLDER):
 
         all_chunks.extend(chunks)
 
+# Ensure chunks exist
+if len(all_chunks) == 0:
+    raise Exception("No PDF chunks found!")
+
+print(f"Total chunks: {len(all_chunks)}")
 
 # Create embeddings
 embeddings = embedding_model.encode(all_chunks)
@@ -82,3 +105,4 @@ with open(CHUNKS_PATH, "wb") as f:
     pickle.dump(all_chunks, f)
 
 print("✅ Vector store created successfully!")
+print(f"Saved FAISS index at: {VECTOR_DB_PATH}")

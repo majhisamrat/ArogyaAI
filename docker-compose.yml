@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 services:
   redis:
@@ -25,16 +25,11 @@ services:
     depends_on:
       - redis
     volumes:
-      - ./data/sqlite:/app/data
+      - ./data/sqlite:/app/storage
       - ./data/vector_db:/app/rag/vector_store
       - ./data/logs:/app/logs
     networks:
       - healthnet
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
 
   nginx:
     image: nginx:stable-alpine
