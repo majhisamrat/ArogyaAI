@@ -1,16 +1,24 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 from groq import Groq
 from config.logger import logger
 
-# Load .env file
-load_dotenv()
+# Base directories
+BACKEND_DIR = Path(__file__).resolve().parent.parent
+WORKSPACE_ROOT = BACKEND_DIR.parent
+
+# Load .env file from current working dir or workspace root
+dotenv_path = Path('.env')
+if not dotenv_path.exists():
+    dotenv_path = WORKSPACE_ROOT / '.env'
+load_dotenv(dotenv_path=dotenv_path)
 
 # ── Groq ──────────────────────────────────────────────
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 # Two models strategy
-GROQ_MAIN_MODEL  = "llama-3.3-70b-versatile"   # Symptom, Education, Outbreak
+GROQ_MAIN_MODEL  = "openai/gpt-oss-120b"   # Symptom, Education, Outbreak
 GROQ_FAST_MODEL  = "llama-3.1-8b-instant"       # Language detection, simple replies
 
 # Groq client (shared across all agents)
@@ -23,7 +31,14 @@ TWILIO_WHATSAPP_NUMBER     = os.getenv("TWILIO_WHATSAPP_NUMBER")  # whatsapp:+14
 TWILIO_VERIFY_SERVICE_SID  = os.getenv("TWILIO_VERIFY_SERVICE_SID")
 
 # ── Database ──────────────────────────────────────────
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///data/health_db.sqlite")
+raw_database_url = os.getenv("DATABASE_URL", "sqlite:///backend/data/health_db.sqlite")
+if raw_database_url.startswith("sqlite:///./"):
+    DATABASE_URL = f"sqlite:///{WORKSPACE_ROOT / raw_database_url[10:]}"
+elif raw_database_url.startswith("sqlite:///") and "./" not in raw_database_url:
+    relative_path = raw_database_url.replace("sqlite:///", "")
+    DATABASE_URL = f"sqlite:///{WORKSPACE_ROOT / relative_path}"
+else:
+    DATABASE_URL = raw_database_url
 
 # ── Redis / Session Memory ─────────────────────────────
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")

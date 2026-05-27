@@ -7,10 +7,12 @@ from api.routes.chat import chat_endpoint
 from api.schemas.chat_schema import ChatRequest
 from whatsapp.message_parser import clean_whatsapp_text
 from whatsapp.twilio_handler import TwilioService
+from services.voice_service import get_voice_service
 
 logger = logging.getLogger(__name__)
 
 whatsapp_service = TwilioService()
+voice_service = get_voice_service()
 
 
 async def handle_whatsapp_webhook(request: Request) -> dict:
@@ -32,12 +34,53 @@ async def handle_whatsapp_webhook(request: Request) -> dict:
     body = params.get("Body", "").strip()
     profile_name = params.get("ProfileName", "").strip()
 
+    # ═══ CHECK FOR AUDIO MEDIA ═══
+    num_media = params.get("NumMedia", "0")
+    try:
+        num_media_int = int(num_media)
+    except (ValueError, TypeError):
+        num_media_int = 0
+
+    if num_media_int > 0:
+        media_url = params.get("MediaUrl0")
+        media_type = params.get("MediaContentType0", "")
+
+        logger.info(f"📦 Audio media detected: {media_type}")
+
+        # Transcribe if media is audio
+        if media_type and media_type.startswith("audio/"):
+            try:
+                logger.info(f"🎤 Starting voice transcription...")
+                transcribed_text = await voice_service.transcribe_whatsapp_audio(
+                    media_url,
+                    media_type,
+                )
+
+                if transcribed_text:
+                    logger.info(f"✅ Voice transcription successful")
+                    body = transcribed_text  # Replace body with transcription
+                else:
+                    logger.warning(
+                        f"⚠️ Voice transcription failed, returning error"
+                    )
+                    raise HTTPException(
+                        status_code=500,
+                        detail="Could not transcribe audio. Please try again.",
+                    )
+
+            except Exception as exc:
+                logger.error(f"❌ Voice transcription error: {exc}", exc_info=True)
+                raise HTTPException(
+                    status_code=500,
+                    detail="Failed to transcribe audio message.",
+                )
+
     logger.info(f"📱 From: {raw_from}, Body: {body}, Profile: {profile_name}")
 
     if not raw_from:
         raise HTTPException(status_code=400, detail="Missing From field in webhook payload.")
     if not body:
-        raise HTTPException(status_code=400, detail="Empty message body.")
+        raise HTTPException(status_code=400, detail="Empty message body or failed transcription.")
 
     phone_number = whatsapp_service.format_phone_number(raw_from)
     logger.info(f"📞 Normalized phone: {phone_number}")

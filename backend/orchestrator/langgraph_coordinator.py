@@ -17,6 +17,7 @@ from agents.memory_agent import MemoryAgent
 from agents.profile_memory_agent import ProfileMemoryAgent
 from agents.memory_selector_agent import MemorySelectorAgent
 from agents.synthesis_agent import SynthesisAgent
+from agents.location_agent import LocationAgent
 
 from database.login_manager import get_user, update_last_active
 from database.conversation_manager import save_message
@@ -110,6 +111,7 @@ class LangGraphCoordinator:
         self.profile_memory_agent = ProfileMemoryAgent()
         self.memory_selector_agent = MemorySelectorAgent()
         self.synthesis_agent = SynthesisAgent()
+        self.location_agent = LocationAgent()
 
         self.memory_manager = MemoryManager()
         self.redis_memory = RedisSessionMemory(redis_url=REDIS_URL)
@@ -542,6 +544,44 @@ class LangGraphCoordinator:
                 if outbreak_result:
                     agent_outputs["outbreak_alert"] = outbreak_result
 
+            elif tool == "hospital_search":
+                # Extract coordinates from user's WhatsApp location or pincode/city
+                import asyncio
+                from concurrent.futures import ThreadPoolExecutor
+                
+                def run_in_new_loop():
+                    """Run async code in a separate thread with its own event loop"""
+                    new_loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(new_loop)
+                    try:
+                        return new_loop.run_until_complete(
+                            self.location_agent.analyze(
+                                query=state["english_text"],
+                                phone_number=state["phone_number"],
+                                user_name=state["user_name"],
+                                pincode=state["pincode"],
+                                latitude=state.get("whatsapp_latitude"),
+                                longitude=state.get("whatsapp_longitude"),
+                                conversation_history=state["conversation_history"],
+                                medical_context=state.get("medical_context", ""),
+                                long_term_memory=state.get("long_term_memory", ""),
+                            )
+                        )
+                    finally:
+                        new_loop.close()
+                
+                try:
+                    # Check if there's already a running event loop
+                    asyncio.get_running_loop()
+                    # If we get here, run in a thread to avoid conflict
+                    with ThreadPoolExecutor() as executor:
+                        location_result = executor.submit(run_in_new_loop).result()
+                except RuntimeError:
+                    # No running event loop, safe to use asyncio.run()
+                    location_result = run_in_new_loop()
+                
+                agent_outputs["hospital_search"] = location_result
+
         if not agent_outputs:
             medical_context = build_medical_context(state["conversation_history"])
             similar_memories = self.vector_memory.search_memory(state["english_text"], k=5)
@@ -575,6 +615,19 @@ class LangGraphCoordinator:
 
     def _node_synthesize_response(self, state: ConversationState) -> ConversationState:
         """Synthesize agent outputs into single response"""
+        hospital_search_output = state["agent_outputs"].get("hospital_search")
+        if hospital_search_output:
+            allowed_keys = {"hospital_search", "outbreak_alert"}
+            if set(state["agent_outputs"].keys()).issubset(allowed_keys):
+                direct_response = (
+                    hospital_search_output.get("full_response")
+                    or hospital_search_output.get("message")
+                    or hospital_search_output.get("response")
+                )
+                if direct_response:
+                    state["response_english"] = direct_response
+                    return state
+
         response_english = self.synthesis_agent.synthesize(
             state["english_text"],
             state["agent_outputs"],

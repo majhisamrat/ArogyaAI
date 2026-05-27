@@ -27,12 +27,14 @@ langdetect
 # Voice
 faster-whisper
 pydub
+ffmpeg-python
 
 # Utilities
 requests
 phonenumbers
 pandas
 numpy
+geopy
 
 # RAG
 sentence-transformers
@@ -53,3 +55,5 @@ redis
 
 mem0ai
 gunicorn
+
+geopy

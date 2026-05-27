@@ -4,11 +4,13 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import declarative_base, relationship
 from datetime import datetime
-from config.settings import DATABASE_URL
+from config.settings import DATABASE_URL, BACKEND_DIR
+from pathlib import Path
 import os
 
-# Create data/ folder if not exists
-os.makedirs("data", exist_ok=True)
+# Create backend/data/ folder if not exists
+db_dir = BACKEND_DIR / "data"
+os.makedirs(db_dir, exist_ok=True)
 
 Base = declarative_base()
 engine = create_engine(DATABASE_URL, echo=False)

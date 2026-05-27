@@ -7,8 +7,12 @@ backend/.env
 logs/
 backend/logs/
 
-# Data / Vector DB
-data/
+# Ignore generated runtime data only
+data/sqlite/
+data/vector_db/
+data/logs/
+
+# Ignore vector DB cache
 backend/rag/vector_store/
 
 # Python cache

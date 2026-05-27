@@ -31,13 +31,23 @@ Available tools:
 - disease_education
 - outbreak_check
 - vaccination_rag
+- hospital_search
 
 Rules:
 - symptom questions → symptom_analysis
-
 - education questions → disease_education
 - area disease concerns → outbreak_check
 - repeated symptoms or history references → health_history
+- location/hospital queries → hospital_search
+
+Use hospital_search for:
+- "hospital near me"
+- "700137 hospital"
+- "clinics in Kolkata"
+- "pharmacies nearby"
+- "ambulance emergency"
+- Any location + facility request
+
 Use vaccination_rag for:
 - vaccination questions
 - pregnancy care
