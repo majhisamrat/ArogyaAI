@@ -33,9 +33,7 @@ class LocationAgent:
         self.name = "LocationAgent"
         self.maps_service = MapsService()
 
-    # ══════════════════════════════════════════════════════
     # INTENT DETECTION
-    # ══════════════════════════════════════════════════════
 
     def _detect_location_intent(self, query: str) -> Dict:
         """
@@ -135,10 +133,8 @@ class LocationAgent:
             "is_emergency": is_emergency,
             "facility_types": facility_types,
         }
-
-    # ══════════════════════════════════════════════════════
+    
     # LOCATION EXTRACTION
-    # ══════════════════════════════════════════════════════
 
     def _extract_place_name(self, query: str) -> Optional[str]:
         """Extract a place name from a free-form location query."""
@@ -258,9 +254,8 @@ class LocationAgent:
             logger.error(f"[{self.name}] Location extraction error: {e}")
             return None
 
-    # ══════════════════════════════════════════════════════
     # MAIN ANALYSIS METHOD
-    # ══════════════════════════════════════════════════════
+
 
     async def analyze(
         self,
@@ -416,10 +411,8 @@ class LocationAgent:
                 "success": False,
                 "message": f"Error processing location query: {str(e)}",
             }
-
-    # ══════════════════════════════════════════════════════
+        
     # RESPONSE FORMATTING
-    # ══════════════════════════════════════════════════════
 
     def _format_response(
         self,

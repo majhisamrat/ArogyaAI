@@ -72,9 +72,8 @@ class MapsService:
             f"{quote_plus(query)}"
         )
 
-    # ══════════════════════════════════════════════════════
+ 
     # PINCODE & LOCATION EXTRACTION
-    # ══════════════════════════════════════════════════════
 
     def extract_pincode(self, text: str) -> Optional[str]:
         """Extract pincode from text. Supports Indian pincodes (6 digits)."""
@@ -106,9 +105,7 @@ class MapsService:
 
         return detected
 
-    # ══════════════════════════════════════════════════════
     # GEOLOCATION FROM PINCODE/CITY
-    # ══════════════════════════════════════════════════════
 
     async def get_coordinates_from_pincode(
         self,
@@ -261,10 +258,8 @@ class MapsService:
         except Exception as e:
             logger.error(f"[MapsService] Reverse geocode error: {e}")
             return None
-
-    # ══════════════════════════════════════════════════════
+        
     # HOSPITAL SEARCH (Overpass API + Nominatim)
-    # ══════════════════════════════════════════════════════
 
     async def search_hospitals_overpass(
         self,

@@ -70,9 +70,9 @@ class SymptomAgent:
             f"{symptoms_english[:60]}"
         )
 
-        # ─────────────────────────────────────
+    
         # Main AI Analysis
-        # ─────────────────────────────────────
+     
 
         result = analyze_symptoms(
 
@@ -102,9 +102,8 @@ class SymptomAgent:
             session_context=session_context
         )
 
-        # ─────────────────────────────────────
         # Return response
-        # ─────────────────────────────────────
+       
 
         return {
 

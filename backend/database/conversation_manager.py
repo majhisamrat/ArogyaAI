@@ -9,11 +9,7 @@ from database.models import (
 from datetime import datetime
 
 
-
-# ─────────────────────────────────────────
 # CREATE CONVERSATION
-# ─────────────────────────────────────────
-
 def create_conversation(
     phone_number: str,
     title: str = "New Chat"
@@ -48,10 +44,7 @@ def create_conversation(
         db.close()
 
 
-
-# ─────────────────────────────────────────
 # SAVE MESSAGE
-# ─────────────────────────────────────────
 
 def save_message(
     conversation_id: int,
@@ -86,10 +79,7 @@ def save_message(
         db.close()
 
 
-
-# ─────────────────────────────────────────
 # GET USER CONVERSATIONS
-# ─────────────────────────────────────────
 
 def get_user_conversations(
     phone_number: str
@@ -135,10 +125,7 @@ def get_user_conversations(
         db.close()
 
 
-
-# ─────────────────────────────────────────
 # GET CONVERSATION MESSAGES
-# ─────────────────────────────────────────
 
 def get_conversation_messages(
     conversation_id: int

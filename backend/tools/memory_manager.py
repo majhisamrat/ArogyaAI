@@ -59,9 +59,8 @@ class MemoryManager:
         )
 
         return memory.summary if memory else ""
-    # ─────────────────────────────────────
+    
 # STRUCTURED MEDICAL MEMORY
-# ─────────────────────────────────────
 
     def save_medical_profile(
         self,

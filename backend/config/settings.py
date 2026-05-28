@@ -8,7 +8,7 @@ from config.logger import logger
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 WORKSPACE_ROOT = BACKEND_DIR.parent
 
-# Load .env file from current working dir or workspace root
+# Load .env 
 dotenv_path = Path('.env')
 if not dotenv_path.exists():
     dotenv_path = WORKSPACE_ROOT / '.env'
@@ -18,10 +18,10 @@ load_dotenv(dotenv_path=dotenv_path)
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 # Two models strategy
-GROQ_MAIN_MODEL  = "openai/gpt-oss-120b"   # Symptom, Education, Outbreak
+GROQ_MAIN_MODEL  = "llama-3.3-70b-versatile"   # Symptom, Education, Outbreak
 GROQ_FAST_MODEL  = "llama-3.1-8b-instant"       # Language detection, simple replies
 
-# Groq client (shared across all agents)
+# Groq client 
 groq_client = Groq(api_key=GROQ_API_KEY)
 
 # ── Twilio ────────────────────────────────────────────
@@ -30,7 +30,7 @@ TWILIO_AUTH_TOKEN          = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_WHATSAPP_NUMBER     = os.getenv("TWILIO_WHATSAPP_NUMBER")  # whatsapp:+14155238886
 TWILIO_VERIFY_SERVICE_SID  = os.getenv("TWILIO_VERIFY_SERVICE_SID")
 
-# ── Database ──────────────────────────────────────────
+# Database 
 raw_database_url = os.getenv("DATABASE_URL", "sqlite:///backend/data/health_db.sqlite")
 if raw_database_url.startswith("sqlite:///./"):
     DATABASE_URL = f"sqlite:///{WORKSPACE_ROOT / raw_database_url[10:]}"
@@ -40,13 +40,13 @@ elif raw_database_url.startswith("sqlite:///") and "./" not in raw_database_url:
 else:
     DATABASE_URL = raw_database_url
 
-# ── Redis / Session Memory ─────────────────────────────
+#  Redis / Session Memory 
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
-# ── Mem0 Long-Term Memory ────────────────────────────
+# Mem0 Long-Term Memory 
 MEM0_API_KEY = os.getenv("MEM0_API_KEY")
 
-# ── App Settings ──────────────────────────────────────
+# App Settings 
 APP_NAME        = "Rural Health Assistant"
 APP_VERSION     = "1.0.0"
 DEBUG           = os.getenv("DEBUG", "False").lower() == "true"
@@ -63,11 +63,11 @@ MAX_TOKENS_EDUCATION = 1024
 MAX_TOKENS_OUTBREAK  = 512
 MAX_TOKENS_LANGUAGE  = 256
 
-# ── Outbreak Settings ─────────────────────────────────
+#  Outbreak Settings 
 OUTBREAK_THRESHOLD      = 5    # 5+ same symptoms in same pincode
 OUTBREAK_WINDOW_DAYS    = 7    # within 7 days = outbreak alert
 
-# ── Supported Languages ───────────────────────────────
+# Supported Languages 
 SUPPORTED_LANGUAGES = {
     "en": "English",
     "hi": "Hindi",
@@ -81,7 +81,7 @@ SUPPORTED_LANGUAGES = {
     "pa": "Punjabi",
 }
 
-# ── Helper: get LLM response (used by all agents) ─────
+# Helper: get LLM response 
 def get_llm_response(
     messages: list,
     model: str = GROQ_MAIN_MODEL,
@@ -104,7 +104,7 @@ def get_llm_response(
         return f"Error: {str(e)}"
 
 
-# ── Validate on startup ───────────────────────────────
+#  Validate on startup 
 def validate_env():
     missing = []
     if not GROQ_API_KEY:

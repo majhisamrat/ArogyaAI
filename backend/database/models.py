@@ -16,7 +16,7 @@ Base = declarative_base()
 engine = create_engine(DATABASE_URL, echo=False)
 
 
-# ── Users Table ───────────────────────────────────────
+# Users Table 
 class User(Base):
     __tablename__ = "users"
 
@@ -38,7 +38,7 @@ class User(Base):
         return f"<User {self.name} | {self.phone_number} | Pincode: {self.pincode}>"
 
 
-# ── Health Records Table ──────────────────────────────
+#  Health Records Table 
 class HealthRecord(Base):
     __tablename__ = "health_records"
 
@@ -80,7 +80,7 @@ class HealthRecord(Base):
     def __repr__(self):
         return f"<HealthRecord User:{self.user_id} | {self.possible_disease} | {self.timestamp}>"
     
-# ── Conversations Table ──────────────────────────────
+# Conversations Table 
 
 class Conversation(Base):
 
@@ -129,7 +129,7 @@ class Conversation(Base):
 
 
 
-# ── Messages Table ───────────────────────────────────
+#  Messages Table 
 
 class Message(Base):
 
@@ -173,7 +173,7 @@ class Message(Base):
         return f"<Message {self.role}>"
 
 
-# ── Outbreak Logs Table ───────────────────────────────
+# Outbreak Logs Table 
 class OutbreakLog(Base):
     __tablename__ = "outbreak_logs"
 
@@ -190,7 +190,7 @@ class OutbreakLog(Base):
         return f"<OutbreakLog {self.disease} | Pincode:{self.pincode} | Cases:{self.case_count}>"
 
 
-# ── WhatsApp Registration State Table ─────────────────
+# WhatsApp Registration State Table 
 # Tracks step-by-step registration progress on WhatsApp
 class RegistrationState(Base):
     __tablename__ = "registration_states"
@@ -208,7 +208,7 @@ class RegistrationState(Base):
     def __repr__(self):
         return f"<RegistrationState {self.phone_number} | Step: {self.current_step}>"
 
-# ── Conversation Summary Memory ─────────────────────
+# Conversation Summary Memory 
 
 class ConversationMemory(Base):
 
@@ -237,7 +237,7 @@ class ConversationMemory(Base):
     )
 
 
-# ── Structured Medical Memory ───────────────────────
+# Structured Medical Memory 
 
 class MedicalMemory(Base):
 
@@ -266,7 +266,7 @@ class MedicalMemory(Base):
     )
 
 
-# ── Dialogue State Table ────────────────────────────
+# Dialogue State Table 
 class DialogueState(Base):
 
     __tablename__ = "dialogue_state"
@@ -320,7 +320,7 @@ class DialogueState(Base):
         return f"<DialogueState Conv:{self.conversation_id} | State:{self.state} | Task:{self.task}>"
 
 
-# ── Create All Tables ─────────────────────────────────
+# Create All Tables 
 def init_db():
     Base.metadata.create_all(engine)
     print("✅ Database tables created successfully!")

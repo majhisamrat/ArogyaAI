@@ -6,9 +6,7 @@ from database.login_manager import (
 from config.logger import logger
 
 
-# ══════════════════════════════════════════════════════
 # STORE HEALTH RECORD
-# ══════════════════════════════════════════════════════
 
 def store_health_record(
     phone_number: str,
@@ -53,9 +51,7 @@ def store_health_record(
     }
 
 
-# ══════════════════════════════════════════════════════
 # FETCH HEALTH HISTORY
-# ══════════════════════════════════════════════════════
 
 def fetch_health_history(
     phone_number: str,

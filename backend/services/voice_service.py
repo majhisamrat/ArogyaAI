@@ -18,10 +18,7 @@ from faster_whisper import WhisperModel
 from config.settings import TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN
 from config.logger import logger
 
-
-# ══════════════════════════════════════════════════════
 # GLOBAL WHISPER MODEL (loaded once on startup)
-# ══════════════════════════════════════════════════════
 
 _whisper_model = None
 
@@ -39,9 +36,7 @@ def _get_whisper_model() -> WhisperModel:
     return _whisper_model
 
 
-# ══════════════════════════════════════════════════════
 # VOICE SERVICE
-# ══════════════════════════════════════════════════════
 
 class VoiceService:
     """Service for downloading and transcribing WhatsApp audio messages."""
@@ -212,10 +207,7 @@ class VoiceService:
             if temp_file:
                 self.cleanup_temp_file(temp_file)
 
-
-# ══════════════════════════════════════════════════════
 # SINGLETON INSTANCE
-# ══════════════════════════════════════════════════════
 
 _voice_service = None
 

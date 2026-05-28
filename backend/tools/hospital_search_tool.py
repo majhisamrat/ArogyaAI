@@ -13,9 +13,7 @@ from services.maps_service import MapsService
 from config.logger import logger
 
 
-# ══════════════════════════════════════════════════════
 # GLOBAL MAPS SERVICE
-# ══════════════════════════════════════════════════════
 
 _maps_service = None
 
@@ -28,9 +26,7 @@ def _get_maps_service() -> MapsService:
     return _maps_service
 
 
-# ══════════════════════════════════════════════════════
 # HOSPITAL SEARCH
-# ══════════════════════════════════════════════════════
 
 async def search_nearby_hospitals(
     latitude: float,
@@ -123,9 +119,7 @@ async def search_nearby_hospitals(
         }
 
 
-# ══════════════════════════════════════════════════════
 # AMBULANCE SEARCH
-# ══════════════════════════════════════════════════════
 
 async def search_nearby_ambulances(
     latitude: float,
@@ -185,9 +179,7 @@ async def search_nearby_ambulances(
         }
 
 
-# ══════════════════════════════════════════════════════
 # CLINIC SEARCH
-# ══════════════════════════════════════════════════════
 
 async def search_nearby_clinics(
     latitude: float,
@@ -244,9 +236,7 @@ async def search_nearby_clinics(
         }
 
 
-# ══════════════════════════════════════════════════════
 # PHARMACY SEARCH
-# ══════════════════════════════════════════════════════
 
 async def search_nearby_pharmacies(
     latitude: float,
@@ -303,9 +293,7 @@ async def search_nearby_pharmacies(
         }
 
 
-# ══════════════════════════════════════════════════════
 # MAIN LOCATION-BASED FACILITY SEARCH
-# ══════════════════════════════════════════════════════
 
 async def search_facilities_near_location(
     latitude: float,

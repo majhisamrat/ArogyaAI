@@ -11,9 +11,7 @@ from config.settings import (
 from config.logger import logger
 
 
-# ══════════════════════════════════════════════════════
 # LLM LANGUAGE + STYLE ANALYZER
-# ══════════════════════════════════════════════════════
 
 def analyze_language_style(user_input: str) -> dict:
     """
@@ -143,9 +141,7 @@ Return ONLY JSON.
         }
 
 
-# ══════════════════════════════════════════════════════
 # TRANSLATE TO ENGLISH
-# ══════════════════════════════════════════════════════
 
 def translate_to_english(
     text: str,
@@ -202,9 +198,8 @@ IMPORTANT RULES:
     return translated.strip()
 
 
-# ══════════════════════════════════════════════════════
 # TRANSLATE TO USER LANGUAGE
-# ══════════════════════════════════════════════════════
+
 
 def translate_to_user_language(
     text: str,
@@ -246,10 +241,7 @@ def translate_to_user_language(
         max_tokens=512
     )
 
-
-# ══════════════════════════════════════════════════════
 # RESPONSE STYLE CONVERTER
-# ══════════════════════════════════════════════════════
 
 def apply_response_style(
     text: str,
@@ -310,9 +302,7 @@ def apply_response_style(
     return text
 
 
-# ══════════════════════════════════════════════════════
 # MAIN PROCESS FUNCTION
-# ══════════════════════════════════════════════════════
 
 def process_language(
     user_input: str,

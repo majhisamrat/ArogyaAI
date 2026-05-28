@@ -11,10 +11,7 @@ from api.schemas.chat_schema import (
 
 router = APIRouter()
 
-
-# ══════════════════════════════════════════════════════
 # API Health Check
-# ══════════════════════════════════════════════════════
 
 @router.get("/health")
 async def health_check():
@@ -24,10 +21,7 @@ async def health_check():
         "service": "Rural Health Assistant API"
     }
 
-
-# ══════════════════════════════════════════════════════
 # User Health History
-# ══════════════════════════════════════════════════════
 
 @router.get(
     "/history/{phone_number}",

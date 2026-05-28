@@ -4,7 +4,7 @@ from database.db_handler import get_db_session
 import requests
 
 
-# ── Pincode → Location helper ─────────────────────────
+# Pincode → Location helper 
 def get_location_from_pincode(pincode: str) -> str:
     """Fetch area name from Indian pincode using free API."""
     try:
@@ -19,9 +19,7 @@ def get_location_from_pincode(pincode: str) -> str:
     return "Unknown Area"
 
 
-# ══════════════════════════════════════════════════════
 #  USER REGISTRATION & LOOKUP
-# ══════════════════════════════════════════════════════
 
 def is_registered(phone_number: str) -> bool:
     """Check if user exists in DB."""
@@ -96,9 +94,7 @@ def update_last_active(phone_number: str):
         db.close()
 
 
-# ══════════════════════════════════════════════════════
 #  HEALTH RECORDS
-# ══════════════════════════════════════════════════════
 
 def save_health_record(
     phone_number: str,
@@ -185,9 +181,7 @@ def get_user_health_history(phone_number: str, limit: int = 5) -> list:
         db.close()
 
 
-# ══════════════════════════════════════════════════════
 #  WHATSAPP REGISTRATION STATE
-# ══════════════════════════════════════════════════════
 
 def get_registration_state(phone_number: str) -> dict | None:
     """Get current WhatsApp registration step."""
