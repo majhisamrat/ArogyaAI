@@ -27,6 +27,7 @@ async def chat_endpoint(payload: ChatRequest):
     response = coordinator.handle_message(
         phone_number=payload.phone_number,
         user_input=payload.message,
+        conversation_id=payload.conversation_id,
         chat_history=history
     )
 

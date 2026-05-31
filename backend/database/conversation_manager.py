@@ -109,16 +109,41 @@ def get_user_conversations(
         for c in conversations:
 
             result.append({
-
                 "id": c.id,
-
                 "title": c.title,
-
+                "created_at": c.created_at.isoformat(),
                 "updated_at": c.updated_at.isoformat()
-
             })
 
         return result
+
+    finally:
+
+        db.close()
+
+
+# UPDATE CONVERSATION TITLE
+
+def update_conversation_title(
+    conversation_id: int,
+    title: str
+):
+    """Update the title of a conversation."""
+
+    db = get_db_session()
+
+    try:
+
+        convo = db.query(Conversation).filter(
+            Conversation.id == conversation_id
+        ).first()
+
+        if convo:
+            convo.title = title[:200]  # Enforce DB column length
+            db.commit()
+            return True
+
+        return False
 
     finally:
 
@@ -147,9 +172,13 @@ def get_conversation_messages(
 
             result.append({
 
+                "id": m.id,
+
                 "role": m.role,
 
-                "content": m.content
+                "content": m.content,
+
+                "timestamp": m.timestamp.isoformat() if m.timestamp else None
 
             })
 
@@ -157,4 +186,27 @@ def get_conversation_messages(
 
     finally:
 
+        db.close()
+
+
+# DELETE CONVERSATION
+def delete_conversation(
+    conversation_id: int
+) -> bool:
+    """Delete a conversation and all its messages from SQLite."""
+    db = get_db_session()
+    try:
+        convo = db.query(Conversation).filter(
+            Conversation.id == conversation_id
+        ).first()
+
+        if convo:
+            db.delete(convo)
+            db.commit()
+            return True
+        return False
+    except Exception:
+        db.rollback()
+        return False
+    finally:
         db.close()

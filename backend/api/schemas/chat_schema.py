@@ -24,6 +24,7 @@ class ChatRequest(BaseModel):
 
     phone_number: str
     message: str
+    conversation_id: Optional[int] = None
     history: Optional[List[ChatMessage]] = []
 
 

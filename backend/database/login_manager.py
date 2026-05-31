@@ -2,13 +2,25 @@ from datetime import datetime
 from database.models import User, HealthRecord, OutbreakLog, RegistrationState
 from database.db_handler import get_db_session
 import requests
+import urllib3
+
+# Suppress insecure request warnings due to verify=False on public pincode API
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 # Pincode → Location helper 
 def get_location_from_pincode(pincode: str) -> str:
     """Fetch area name from Indian pincode using free API."""
     try:
-        res = requests.get(f"https://api.postalpincode.in/pincode/{pincode}", timeout=5)
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+        res = requests.get(
+            f"https://api.postalpincode.in/pincode/{pincode}",
+            headers=headers,
+            timeout=5,
+            verify=False
+        )
         data = res.json()
         if data[0]["Status"] == "Success":
             post_office = data[0]["PostOffice"][0]
@@ -17,6 +29,7 @@ def get_location_from_pincode(pincode: str) -> str:
     except Exception:
         pass
     return "Unknown Area"
+
 
 
 #  USER REGISTRATION & LOOKUP
@@ -92,6 +105,21 @@ def update_last_active(phone_number: str):
             db.commit()
     finally:
         db.close()
+
+
+def update_user_language(phone_number: str, language: str) -> bool:
+    """Update preferred language for user."""
+    db = get_db_session()
+    try:
+        user = db.query(User).filter(User.phone_number == phone_number).first()
+        if user:
+            user.language = language
+            db.commit()
+            return True
+        return False
+    finally:
+        db.close()
+
 
 
 #  HEALTH RECORDS

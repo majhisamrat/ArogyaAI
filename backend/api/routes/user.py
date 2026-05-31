@@ -1,9 +1,11 @@
 from fastapi import APIRouter, HTTPException
 
+from pydantic import BaseModel
 from database.login_manager import (
     register_user,
     get_user,
-    is_registered
+    is_registered,
+    update_user_language
 )
 
 from api.schemas.user_schema import (
@@ -50,3 +52,26 @@ async def register_user_endpoint(payload: UserRegisterRequest):
     )
 
     return UserResponse(**user)
+
+
+class UserUpdateLanguageRequest(BaseModel):
+    phone_number: str
+    language: str
+
+
+@router.post("/user/update-language")
+async def update_user_language_endpoint(payload: UserUpdateLanguageRequest):
+    success = update_user_language(
+        phone_number=payload.phone_number,
+        language=payload.language
+    )
+    if not success:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+    return {
+        "success": True,
+        "message": "Language updated successfully",
+        "language": payload.language
+    }

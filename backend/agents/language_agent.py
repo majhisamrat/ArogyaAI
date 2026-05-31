@@ -54,33 +54,29 @@ class LanguageAgent:
     ) -> str:
         """
         Translate and preserve conversational style.
+        - Transliteration styles (hinglish, banglish, tanglish, etc.) → apply_response_style
+        - Native script styles (hindi, bengali, tamil, etc.) → translate_to_user_language
+        - English → return as-is
         """
-        # Banglish / Hinglish special handling
 
-        if response_style in ["banglish", "hinglish"]:
+        # All transliteration/romanised styles — respond using English letters
+        transliteration_styles = {
+            "hinglish", "banglish", "tanglish", "tenglish",
+            "manglish", "gujarish", "kanglish", "manglish_ml",
+            "punglish", "odish"
+        }
 
-            styled = apply_response_style(
-                response_text,
-                response_style
-            )
-
+        if response_style in transliteration_styles:
+            styled = apply_response_style(response_text, response_style)
             logger.info(
-                f"[{self.name}] "
-                f"Applied direct style conversion: {response_style}"
+                f"[{self.name}] Applied transliteration style: {response_style}"
             )
-
             return styled
 
-        # Normal translation flow
-
-        translated = translate_to_user_language(
-            response_text,
-            target_lang
-        )
-
+        # For native script languages (hi, bn, ta, te, mr, gu, kn, ml, pa, od)
+        # translate_to_user_language handles the proper script
+        translated = translate_to_user_language(response_text, target_lang)
         logger.info(
-            f"[{self.name}] "
-            f"Translated to: {target_lang}"
+            f"[{self.name}] Translated to: {target_lang} (style: {response_style})"
         )
-
         return translated

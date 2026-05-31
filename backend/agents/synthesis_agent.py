@@ -50,6 +50,10 @@ class SynthesisAgent:
                 "role": "system",
                 "content": (
                     "You are a calm, supportive medical assistant.\n\n"
+                    "CRITICAL LANGUAGE RULE:\n"
+                    "- ALWAYS write your response in ENGLISH only.\n"
+                    "- NEVER write in Hindi, Bengali, Tamil or any other language.\n"
+                    "- A separate translation step will handle delivering the response in the user's language.\n\n"
                     "Output must follow this structure exactly:\n\n"
                     "1) A short acknowledgement sentence.\n"
                     "2) A simple explanation (1-2 lines).\n"

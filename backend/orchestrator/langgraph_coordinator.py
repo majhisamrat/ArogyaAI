@@ -703,6 +703,20 @@ class LangGraphCoordinator:
         if not user:
             return "❌ User not registered. Please register first."
 
+        # Automatically resolve conversation_id to latest SQL session for WhatsApp sync
+        if not conversation_id:
+            try:
+                from database.conversation_manager import get_user_conversations, create_conversation
+                convs = get_user_conversations(phone_number)
+                if convs:
+                    conversation_id = convs[0]["id"]
+                    logger.info(f"📱 WhatsApp auto-synced to active SQLite conversation ID: {conversation_id}")
+                else:
+                    conversation_id = create_conversation(phone_number, title="WhatsApp Chat")
+                    logger.info(f"📱 WhatsApp initialized new SQLite conversation ID: {conversation_id}")
+            except Exception as e:
+                logger.error(f"❌ Failed to resolve WhatsApp conversation ID: {e}")
+
         # Initialize state
         initial_state: ConversationState = {
             "phone_number": phone_number,

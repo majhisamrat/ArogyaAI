@@ -79,6 +79,7 @@ SUPPORTED_LANGUAGES = {
     "kn": "Kannada",
     "ml": "Malayalam",
     "pa": "Punjabi",
+    "od": "Odia",
 }
 
 # Helper: get LLM response 
