@@ -117,8 +117,8 @@ def validate_env():
     if not TWILIO_VERIFY_SERVICE_SID:
         missing.append("TWILIO_VERIFY_SERVICE_SID")
     if missing:
-        print(f"⚠️  Missing env variables: {', '.join(missing)}")
+        print(f"[Warning] Missing env variables: {', '.join(missing)}")
     else:
-        print("✅ All environment variables loaded successfully!")
+        print("All environment variables loaded successfully!")
 
 validate_env()

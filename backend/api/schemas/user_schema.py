@@ -10,6 +10,7 @@ class UserRegisterRequest(BaseModel):
     gender: str
     pincode: str
     language: str = "en"
+    otp: str
 
 
 class UserResponse(BaseModel):
@@ -22,3 +23,4 @@ class UserResponse(BaseModel):
     pincode: str
     location_area: Optional[str] = None
     language: str
+    token: Optional[str] = None

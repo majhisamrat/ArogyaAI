@@ -323,7 +323,7 @@ class DialogueState(Base):
 # Create All Tables 
 def init_db():
     Base.metadata.create_all(engine)
-    print("✅ Database tables created successfully!")
+    print("Database tables created successfully!")
 
 
 if __name__ == "__main__":

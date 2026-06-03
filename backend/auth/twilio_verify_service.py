@@ -17,6 +17,10 @@ def _get_twilio_client() -> Client:
 
 def _extract_error_message(exc: Exception) -> str:
     if isinstance(exc, TwilioRestException):
+        if exc.code == 21608:
+            return "Twilio Trial Limit: The phone number is unverified. Please add it to Verified Caller IDs in your Twilio Console."
+        if hasattr(exc, "msg") and exc.msg:
+            return exc.msg
         return str(exc)
     return "Twilio Verify request failed"
 
@@ -47,32 +51,19 @@ def send_verification_otp(phone_number: str, channel: str = "sms") -> dict:
             "message": _extract_error_message(exc),
         }
     except ValueError as exc:
-        # Development Mock Fallback
-        import logging
-        logging.getLogger(__name__).info(f"🔑 [DEV MOCK OTP] Twilio Verify SID is missing. Verification code for {phone_number} is: 123456")
         return {
-            "success": True,
-            "message": "OTP sent (Mock: 123456)",
+            "success": False,
+            "message": f"Twilio configuration error: {str(exc)}",
         }
-    except Exception:
-        # Development Mock Fallback
-        import logging
-        logging.getLogger(__name__).info(f"🔑 [DEV MOCK OTP] Exception occurred. Verification code for {phone_number} is: 123456")
+    except Exception as exc:
         return {
-            "success": True,
-            "message": "OTP sent (Mock: 123456)",
+            "success": False,
+            "message": f"Failed to send OTP: {str(exc)}",
         }
 
 
 def verify_otp_code(phone_number: str, code: str) -> dict:
     """Verify the provided OTP code using Twilio Verify."""
-    # Development Mock Fallback: if code is 123456, approve it
-    if code == "123456":
-        return {
-            "success": True,
-            "message": "OTP verified (Mock)",
-        }
-
     try:
         client = _get_twilio_client()
         verification_check = client.verify.services(TWILIO_VERIFY_SERVICE_SID).verification_checks.create(
@@ -97,24 +88,13 @@ def verify_otp_code(phone_number: str, code: str) -> dict:
             "message": _extract_error_message(exc),
         }
     except ValueError as exc:
-        # Development Mock Fallback check
-        if code == "123456":
-            return {
-                "success": True,
-                "message": "OTP verified (Mock)",
-            }
         return {
             "success": False,
-            "message": "Invalid OTP. Twilio is unconfigured, try '123456'.",
+            "message": f"Twilio configuration error: {str(exc)}",
         }
-    except Exception:
-        if code == "123456":
-            return {
-                "success": True,
-                "message": "OTP verified (Mock)",
-            }
+    except Exception as exc:
         return {
             "success": False,
-            "message": "OTP verification failed",
+            "message": f"OTP verification failed: {str(exc)}",
         }
 

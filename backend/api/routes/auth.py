@@ -17,8 +17,8 @@ router = APIRouter()
 
 
 class SendOtpRequest(BaseModel):
-
     phone_number: str
+    purpose: str = "login"  # "login" or "register"
 
 
 class VerifyOtpRequest(BaseModel):
@@ -31,12 +31,18 @@ class VerifyOtpRequest(BaseModel):
 @router.post("/send-otp")
 async def send_otp(payload: SendOtpRequest):
 
-    if not is_registered(payload.phone_number):
-
-        return {
-            "success": False,
-            "message": "Phone number is not registered"
-        }
+    if payload.purpose == "register":
+        if is_registered(payload.phone_number):
+            return {
+                "success": False,
+                "message": "Phone number is already registered"
+            }
+    else:  # default is "login"
+        if not is_registered(payload.phone_number):
+            return {
+                "success": False,
+                "message": "Phone number is not registered"
+            }
 
     result = await run_in_threadpool(
         send_verification_otp,

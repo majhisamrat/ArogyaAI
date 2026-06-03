@@ -12,6 +12,8 @@ from api.schemas.user_schema import (
     UserRegisterRequest,
     UserResponse
 )
+from auth.otp_service import verify_otp_code
+from api.auth.jwt_handler import create_access_token
 
 router = APIRouter()
 
@@ -42,6 +44,14 @@ async def register_user_endpoint(payload: UserRegisterRequest):
             detail="User already registered"
         )
 
+    # Verify OTP first for secure registration
+    otp_res = verify_otp_code(payload.phone_number, payload.otp)
+    if not otp_res.get("success"):
+        raise HTTPException(
+            status_code=400,
+            detail=otp_res.get("message", "Invalid or expired OTP")
+        )
+
     user = register_user(
         phone_number=payload.phone_number,
         name=payload.name,
@@ -51,7 +61,12 @@ async def register_user_endpoint(payload: UserRegisterRequest):
         language=payload.language
     )
 
-    return UserResponse(**user)
+    # Create JWT access token for immediate session setup
+    token = create_access_token({"phone_number": payload.phone_number})
+    response_data = dict(user)
+    response_data["token"] = token
+
+    return UserResponse(**response_data)
 
 
 class UserUpdateLanguageRequest(BaseModel):
