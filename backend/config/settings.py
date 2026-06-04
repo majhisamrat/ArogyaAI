@@ -46,6 +46,9 @@ REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 # Mem0 Long-Term Memory 
 MEM0_API_KEY = os.getenv("MEM0_API_KEY")
 
+# CORS Origins
+CORS_ORIGINS = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "").split(",") if origin.strip()]
+
 # App Settings 
 APP_NAME        = "Rural Health Assistant"
 APP_VERSION     = "1.0.0"

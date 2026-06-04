@@ -5,6 +5,7 @@ from api.routes.chat import router as chat_router
 from api.routes.user import router as user_router
 from api.routes.health import router as health_router
 
+from config.settings import CORS_ORIGINS
 from database.models import init_db
 from api.routes.auth import router as auth_router
 from api.routes.conversation import router as conversation_router
@@ -23,7 +24,7 @@ app = FastAPI(
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=CORS_ORIGINS or ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
