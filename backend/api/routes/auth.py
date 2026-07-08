@@ -8,7 +8,7 @@ from auth.otp_service import (
     verify_otp_code,
 )
 
-from api.auth.jwt_handler import (
+from ..auth.jwt_handler import (
     create_access_token
 )
 from database.login_manager import is_registered
