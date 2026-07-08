@@ -14,15 +14,21 @@ if not dotenv_path.exists():
     dotenv_path = WORKSPACE_ROOT / '.env'
 load_dotenv(dotenv_path=dotenv_path)
 
-# ── Groq ──────────────────────────────────────────────
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+# ── Groq Multi-Key System ─────────────────────────────
+# Load API keys 1-6 from environment
+GROQ_API_KEYS = {
+    i: os.getenv(f"GROQ_API_KEY_{i}") 
+    for i in range(1, 7)
+}
 
 # Two models strategy
 GROQ_MAIN_MODEL  = "llama-3.3-70b-versatile"   # Symptom, Education, Outbreak
 GROQ_FAST_MODEL  = "llama-3.1-8b-instant"       # Language detection, simple replies
 
-# Groq client 
-groq_client = Groq(api_key=GROQ_API_KEY)
+# Legacy client (kept for backward compatibility if needed)
+# Most requests now use async client from services/groq_client.py
+GROQ_API_KEY_1 = GROQ_API_KEYS.get(1)
+groq_client = Groq(api_key=GROQ_API_KEY_1) if GROQ_API_KEY_1 else None
 
 # ── Twilio ────────────────────────────────────────────
 TWILIO_ACCOUNT_SID         = os.getenv("TWILIO_ACCOUNT_SID")
@@ -111,17 +117,22 @@ def get_llm_response(
 #  Validate on startup 
 def validate_env():
     missing = []
-    if not GROQ_API_KEY:
-        missing.append("GROQ_API_KEY")
+    # Check for at least GROQ_API_KEY_1 (multi-key system)
+    if not GROQ_API_KEY_1:
+        missing.append("GROQ_API_KEY_1 (need at least one Groq API key)")
     if not TWILIO_ACCOUNT_SID:
         missing.append("TWILIO_ACCOUNT_SID")
     if not TWILIO_AUTH_TOKEN:
         missing.append("TWILIO_AUTH_TOKEN")
     if not TWILIO_VERIFY_SERVICE_SID:
         missing.append("TWILIO_VERIFY_SERVICE_SID")
+    
     if missing:
         print(f"[Warning] Missing env variables: {', '.join(missing)}")
     else:
         print("All environment variables loaded successfully!")
+        # Show how many Groq API keys are configured
+        active_keys = sum(1 for i in range(1, 7) if GROQ_API_KEYS.get(i))
+        print(f"[Groq] {active_keys}/6 API keys configured")
 
 validate_env()
