@@ -5,7 +5,7 @@ from database.login_manager import (
     get_user
 )
 
-from ..schemas.chat_schema import (
+from api.schemas.chat_schema import (
     HealthRecordResponse
 )
 

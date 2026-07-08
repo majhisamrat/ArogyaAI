@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from ..schemas.chat_schema import (
+from api.schemas.chat_schema import (
     ChatRequest,
     ChatResponse
 )
