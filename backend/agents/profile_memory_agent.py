@@ -1,6 +1,6 @@
 from config.settings import (
     get_llm_response,
-    GROQ_MAIN_MODEL
+    GROQ_FAST_MODEL
 )
 
 import json
@@ -46,7 +46,7 @@ class ProfileMemoryAgent:
 
             messages,
 
-            model=GROQ_MAIN_MODEL,
+            model=GROQ_FAST_MODEL,
 
             temperature=0.1,
 

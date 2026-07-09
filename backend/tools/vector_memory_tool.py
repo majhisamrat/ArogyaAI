@@ -68,7 +68,7 @@ class VectorMemory:
         metadata=None
     ):
 
-        embedding = MODEL.encode([text])
+        embedding = MODEL.encode([text], show_progress_bar=False)
 
         self.index.add(
             np.array(embedding).astype("float32")
@@ -102,7 +102,7 @@ class VectorMemory:
         if len(self.chunks) == 0:
             return []
 
-        embedding = MODEL.encode([query])
+        embedding = MODEL.encode([query], show_progress_bar=False)
 
         distances, indices = self.index.search(
 

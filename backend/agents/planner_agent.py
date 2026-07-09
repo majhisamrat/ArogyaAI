@@ -2,7 +2,7 @@ import json
 
 from config.settings import (
     get_llm_response,
-    GROQ_MAIN_MODEL
+    GROQ_FAST_MODEL
 )
 
 from tools.tool_registry import TOOL_REGISTRY
@@ -112,7 +112,7 @@ class PlannerAgent:
 
         raw = get_llm_response(
             messages,
-            model=GROQ_MAIN_MODEL,
+            model=GROQ_FAST_MODEL,
             temperature=0.2,
             max_tokens=300
         )

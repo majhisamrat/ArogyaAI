@@ -49,8 +49,11 @@ class AsyncGroqClient:
         self.cache = get_response_cache(redis_url)
         self._client_pool: Dict[str, Groq] = {}
         self._lock = asyncio.Lock()
+        
+        # Override class MAX_RETRIES to scale dynamically with configured keys pool
+        self.MAX_RETRIES = max(3, len(self.api_key_manager.get_all_keys()) - 1)
 
-        logger.info("[AsyncGroqClient] Initialized with async support")
+        logger.info(f"[AsyncGroqClient] Initialized with async support. Dynamic retries limit: {self.MAX_RETRIES}")
 
     def _get_groq_client(self, api_key: str) -> Groq:
         """

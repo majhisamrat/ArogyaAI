@@ -1,6 +1,6 @@
 from config.settings import (
     get_llm_response,
-    GROQ_MAIN_MODEL
+    GROQ_FAST_MODEL
 )
 
 
@@ -40,7 +40,7 @@ class MemoryAgent:
 
         return get_llm_response(
             prompt,
-            model=GROQ_MAIN_MODEL,
+            model=GROQ_FAST_MODEL,
             temperature=0.2,
             max_tokens=200
         )

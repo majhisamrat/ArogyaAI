@@ -22,7 +22,8 @@ class MemorySelectorAgent:
 
         query_embedding = MODEL.encode(
             query,
-            convert_to_tensor=True
+            convert_to_tensor=True,
+            show_progress_bar=False
         )
 
         scored = []
@@ -33,7 +34,8 @@ class MemorySelectorAgent:
 
             memory_embedding = MODEL.encode(
                 text,
-                convert_to_tensor=True
+                convert_to_tensor=True,
+                show_progress_bar=False
             )
 
             similarity = util.cos_sim(

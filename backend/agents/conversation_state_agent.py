@@ -1,8 +1,8 @@
-﻿import json
+import json
 
 from config.settings import (
     get_llm_response,
-    GROQ_MAIN_MODEL
+    GROQ_FAST_MODEL
 )
 
 
@@ -87,7 +87,7 @@ class ConversationStateAgent:
 
         response = get_llm_response(
             messages,
-            model=GROQ_MAIN_MODEL,
+            model=GROQ_FAST_MODEL,
             temperature=0.1,
             max_tokens=280
         )

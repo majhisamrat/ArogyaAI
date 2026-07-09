@@ -3,12 +3,13 @@ from pathlib import Path
 from dotenv import load_dotenv
 from groq import Groq
 from config.logger import logger
+import asyncio
 
 # Base directories
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 WORKSPACE_ROOT = BACKEND_DIR.parent
 
-# Load .env 
+# Load .env
 dotenv_path = Path('.env')
 if not dotenv_path.exists():
     dotenv_path = WORKSPACE_ROOT / '.env'
@@ -17,7 +18,7 @@ load_dotenv(dotenv_path=dotenv_path)
 # ── Groq Multi-Key System ─────────────────────────────
 # Load API keys 1-6 from environment
 GROQ_API_KEYS = {
-    i: os.getenv(f"GROQ_API_KEY_{i}") 
+    i: os.getenv(f"GROQ_API_KEY_{i}")
     for i in range(1, 7)
 }
 
@@ -30,13 +31,13 @@ GROQ_FAST_MODEL  = "llama-3.1-8b-instant"       # Language detection, simple rep
 GROQ_API_KEY_1 = GROQ_API_KEYS.get(1)
 groq_client = Groq(api_key=GROQ_API_KEY_1) if GROQ_API_KEY_1 else None
 
-# ── Twilio ────────────────────────────────────────────
+# Twilio 
 TWILIO_ACCOUNT_SID         = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN          = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_WHATSAPP_NUMBER     = os.getenv("TWILIO_WHATSAPP_NUMBER")  # whatsapp:+14155238886
 TWILIO_VERIFY_SERVICE_SID  = os.getenv("TWILIO_VERIFY_SERVICE_SID")
 
-# Database 
+# Database
 raw_database_url = os.getenv("DATABASE_URL", "sqlite:///backend/data/health_db.sqlite")
 if raw_database_url.startswith("sqlite:///./"):
     DATABASE_URL = f"sqlite:///{WORKSPACE_ROOT / raw_database_url[10:]}"
@@ -46,16 +47,16 @@ elif raw_database_url.startswith("sqlite:///") and "./" not in raw_database_url:
 else:
     DATABASE_URL = raw_database_url
 
-#  Redis / Session Memory 
+#  Redis / Session Memory
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
-# Mem0 Long-Term Memory 
+# Mem0 Long-Term Memory
 MEM0_API_KEY = os.getenv("MEM0_API_KEY")
 
 # CORS Origins
 CORS_ORIGINS = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "").split(",") if origin.strip()]
 
-# App Settings 
+# App Settings
 APP_NAME        = "Rural Health Assistant"
 APP_VERSION     = "1.0.0"
 DEBUG           = os.getenv("DEBUG", "False").lower() == "true"
@@ -72,11 +73,11 @@ MAX_TOKENS_EDUCATION = 1024
 MAX_TOKENS_OUTBREAK  = 512
 MAX_TOKENS_LANGUAGE  = 256
 
-#  Outbreak Settings 
+#  Outbreak Settings
 OUTBREAK_THRESHOLD      = 5    # 5+ same symptoms in same pincode
 OUTBREAK_WINDOW_DAYS    = 7    # within 7 days = outbreak alert
 
-# Supported Languages 
+# Supported Languages
 SUPPORTED_LANGUAGES = {
     "en": "English",
     "hi": "Hindi",
@@ -91,30 +92,82 @@ SUPPORTED_LANGUAGES = {
     "od": "Odia",
 }
 
-# Helper: get LLM response 
+# Async Groq client integration
+from services.groq_client import get_async_groq_client
+_async_groq_client = None  # Lazy initialization
+USE_ASYNC_CLIENT = True   # Set to False to fallback to legacy synchronous client
+
+async def _get_llm_response_async(
+    messages: list,
+    model: str = GROQ_MAIN_MODEL,
+    temperature: float = 0.5,
+    max_tokens: int = 1024,
+) -> str:
+    """Uses async client with caching and retry logic"""
+    global _async_groq_client
+    if _async_groq_client is None:
+        _async_groq_client = get_async_groq_client(REDIS_URL)
+    response = await _async_groq_client.chat_completions_create(
+        messages=messages,
+        model=model,
+        temperature=temperature,
+        max_tokens=max_tokens,
+        use_cache=True,
+    )
+    return response
+
 def get_llm_response(
     messages: list,
     model: str = GROQ_MAIN_MODEL,
     temperature: float = 0.5,
     max_tokens: int = 1024,
 ) -> str:
-    """
-    Shared function to call Groq API.
-    messages format: [{"role": "system/user/assistant", "content": "..."}]
-    """
+    """Maintains compatibility with all existing code"""
     try:
-        response = groq_client.chat.completions.create(
-            model=model,
-            messages=messages,
-            temperature=temperature,
-            max_tokens=max_tokens,
-        )
-        return response.choices[0].message.content.strip()
+        if USE_ASYNC_CLIENT:
+            try:
+                loop = asyncio.get_running_loop()
+            except RuntimeError:
+                loop = None
+
+            if loop and loop.is_running():
+                import concurrent.futures
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    future = executor.submit(
+                        lambda: asyncio.run(
+                            _get_llm_response_async(
+                                messages=messages,
+                                model=model,
+                                temperature=temperature,
+                                max_tokens=max_tokens,
+                            )
+                        )
+                    )
+                    return future.result()
+            else:
+                return asyncio.run(
+                    _get_llm_response_async(
+                        messages=messages,
+                        model=model,
+                        temperature=temperature,
+                        max_tokens=max_tokens,
+                    )
+                )
+        else:
+            # Fallback to legacy client
+            response = groq_client.chat.completions.create(
+                model=model,
+                messages=messages,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+            return response.choices[0].message.content.strip()
     except Exception as e:
+        logger.error(f"[Settings] LLM request failed: {str(e)}")
         return f"Error: {str(e)}"
 
 
-#  Validate on startup 
+#  Validate on startup
 def validate_env():
     missing = []
     # Check for at least GROQ_API_KEY_1 (multi-key system)
@@ -126,7 +179,7 @@ def validate_env():
         missing.append("TWILIO_AUTH_TOKEN")
     if not TWILIO_VERIFY_SERVICE_SID:
         missing.append("TWILIO_VERIFY_SERVICE_SID")
-    
+
     if missing:
         print(f"[Warning] Missing env variables: {', '.join(missing)}")
     else:

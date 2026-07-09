@@ -22,7 +22,7 @@ with open(CHUNKS_PATH, "rb") as f:
 
 def retrieve_medical_context(query: str, top_k=3):
 
-    query_embedding = embedding_model.encode([query])
+    query_embedding = embedding_model.encode([query], show_progress_bar=False)
 
     query_embedding = np.array(query_embedding).astype("float32")
 

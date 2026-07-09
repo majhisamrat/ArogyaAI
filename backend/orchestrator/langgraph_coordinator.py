@@ -182,15 +182,33 @@ class LangGraphCoordinator:
         return state
 
     def _node_language_processing(self, state: ConversationState) -> ConversationState:
-        """Detect language and translate"""
-        lang_result = self.language_agent.process_input(
-            state["user_input"],
-            state["pref_lang"]
-        )
+        """Detect language, translate, and search Mem0 in parallel"""
+        import concurrent.futures
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+            future_lang = executor.submit(
+                self.language_agent.process_input,
+                state["user_input"],
+                state["pref_lang"]
+            )
+            future_mem0 = executor.submit(
+                self.mem0_client.search,
+                user_id=state["phone_number"],
+                query=state["user_input"],
+                top_k=5
+            )
+
+            lang_result = future_lang.result()
+            mem0_results = future_mem0.result()
 
         state["detected_lang"] = lang_result["detected_language"]
         state["english_text"] = lang_result["english_text"]
         state["response_style"] = lang_result.get("response_style", "english")
+        
+        state["long_term_memory"] = "\n".join(
+            self.mem0_client.format_search_results(mem0_results)
+        ) if mem0_results else ""
+
         self.redis_memory.save_message(state["phone_number"], "user", state["user_input"])
 
         if state["conversation_id"]:
@@ -252,16 +270,6 @@ class LangGraphCoordinator:
             state["summary_memory"] = self.memory_manager.get_summary(state["conversation_id"]) or ""
 
         state["structured_profile"] = self.memory_manager.get_medical_profile(state["phone_number"]) or ""
-
-        mem0_results = self.mem0_client.search(
-            user_id=state["phone_number"],
-            query=state["english_text"],
-            top_k=5
-        )
-
-        state["long_term_memory"] = "\n".join(
-            self.mem0_client.format_search_results(mem0_results)
-        ) if mem0_results else ""
 
         return state
 

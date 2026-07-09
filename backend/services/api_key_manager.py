@@ -55,7 +55,7 @@ class APIKeyManager:
     """
 
     COOLDOWN_DURATION = 60  # seconds
-    ERROR_CODES = {429, 500, 502, 503, 504}  # HTTP status codes that mark key as unhealthy
+    ERROR_CODES = {401, 403, 429, 500, 502, 503, 504}  # HTTP status codes that mark key as unhealthy
 
     def __init__(self):
         """Initialize API key manager by loading keys from environment"""
@@ -100,6 +100,7 @@ class APIKeyManager:
             APIKeyStats or None if no healthy keys available
         """
         with self._lock:
+            self.auto_recover_keys()  # Auto-recover expired cooldowns
             current_time = time.time()
 
             # Get available keys (healthy and not in cooldown)
