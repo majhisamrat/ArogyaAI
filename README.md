@@ -12,7 +12,7 @@
 - **WhatsApp Integration** – Native WhatsApp messaging via Twilio API for accessibility
 - **Production-Grade Deployment** – Docker containerization, AWS EC2 backend, Vercel frontend, with monitoring dashboards
 - **Drift Detection & Monitoring** – Real-time detection of model performance degradation and language-specific accuracy regressions
-- **Emergency Escalation** – Automatic routing of high-risk cases to human doctors with confidence-based flagging
+- **Emergency Escalation** – Automatic routing of high-risk cases to human doctors with confidence-based flagging 
 
 ---
 
